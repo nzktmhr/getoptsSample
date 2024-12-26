@@ -1,0 +1,40 @@
+name: Getopts Example
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up script
+        run: |
+          echo "Creating script.sh"
+          cat << 'EOF' > script.sh
+          #!/bin/bash
+          name="DefaultUser"
+          age=0
+          while getopts "n:a:" opt; do
+            case $opt in
+              n) name=$OPTARG ;;
+              a) age=$OPTARG ;;
+              *)
+                echo "Usage: $0 -n <name> -a <age>"
+                exit 1
+                ;;
+            esac
+          done
+          echo "Name: $name"
+          echo "Age: $age"
+          EOF
+          chmod +x script.sh
+
+      - name: Run script with getopts
+        run: |
+          ./script.sh -n "GitHubUser" -a 25
